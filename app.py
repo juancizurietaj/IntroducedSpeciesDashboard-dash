@@ -78,7 +78,7 @@ organism_type = dbc.Card([
 ], body=True, className="card-box")
 
 pathway = dbc.Card([
-    html.Div(html.Label("Species pathways to Galapagos", className="labels"), className="label-container"),
+    html.Div(html.Label("Pathways to Galapagos", className="labels"), className="label-container"),
     html.Div(dcc.Graph(id="pathway", config={'displayModeBar': False})),
     html.Div(
         dbc.Button("See sub-pathways", id="subpathway-modal-btn", size="sm", outline=True, color="primary", n_clicks=0),
@@ -86,14 +86,14 @@ pathway = dbc.Card([
 ], body=True, className="card-box")
 
 moi = dbc.Card([
-    html.Div(html.Label("Species mode of introduction", className="labels"), className="label-container"),
+    html.Div(html.Label("Mode of introduction", className="labels"), className="label-container"),
     html.Div(dcc.Graph(id="moi", config={'displayModeBar': False}))
 ], body=True, className="card-box")
 
 gps_status = dbc.Card([
     dbc.CardBody(
         [
-            html.Div(html.Label("Species status in Galapagos", className="labels"), className="label-container"),
+            html.Div(html.Label("Status in Galapagos", className="labels"), className="label-container"),
             html.Div(id="gpsstatus")
         ]
     ),
@@ -107,7 +107,14 @@ subpathway_modal = dbc.Modal(id="subpathway-modal",
                              children=[
                                  dbc.ModalHeader(dbc.ModalTitle("Species subpathways")),
                                  dbc.ModalBody(
-                                     html.Div(dcc.Graph(id="subpathway", config={'displayModeBar': False})),
+                                     [
+                                         html.Div(html.Label("Subpathways frequencies", className="labels")),
+                                         html.Div(dcc.Graph(id="subpathway", config={'displayModeBar': False})),
+                                         html.Div(
+                                             html.Label("Relation between organism types, pathways and subpathways",
+                                                        className="labels")),
+                                         html.Div(dcc.Graph(id="sankey"))
+                                     ]
                                  )
                              ],
                              size="xl",
@@ -120,10 +127,10 @@ app.layout = html.Div([
         total,
         status,
         organism_type,
-        pathway,
         moi,
+        pathway,
         gps_status,
-        subpathway_modal
+        subpathway_modal,
     ], className="page-container"),
     html.Div([
 
@@ -203,6 +210,7 @@ def check_all_status(check):
     Output("subpathway", "figure"),
     Output("subpathway-modal", "is_open"),
     Output("subpathway-modal-btn", "n_clicks"),
+    Output("sankey", "figure"),
     Input("status-selection", "value"),
     Input("organism-type-selection", "value"),
     Input("pathway-selection", "value"),
@@ -283,8 +291,11 @@ def update_layout(status_selection, organism_type_selection, pathway_selection, 
         open_modal = True
         subpathway_btn = 0
 
+    # Sankey
+    sankey_fig = create_sankey(sankey_labels["labels"], sankey["source"], sankey["target"], sankey["value"])
+
     return total_species, cum_count, last_record, status_layout, organism_type_layout \
-        , pathway_chart, moi_chart, gps_status_chart, subpathway_chart, open_modal, subpathway_btn
+        , pathway_chart, moi_chart, gps_status_chart, subpathway_chart, open_modal, subpathway_btn, sankey_fig
 
 
 if __name__ == '__main__':

@@ -8,9 +8,9 @@ import plotly.graph_objects as go
 
 # Import data
 data = pd.read_feather(r"C:\Users\juancarlos.izurieta\Documents\R projects\IntroducedSpeciesDashboard\data\ie_joined.feather")
-sk = pd.read_feather(r"C:\Users\juancarlos.izurieta\Documents\R projects\IntroducedSpeciesDashboard\data\sankey.feather")
-sk_labels = pd.read_feather(
-    r"C:\Users\juancarlos.izurieta\Documents\R projects\IntroducedSpeciesDashboard\data\sankey_labels.feather")
+sankey = pd.read_feather(r"C:\Users\juancarlos.izurieta\Documents\R projects\IntroducedSpeciesDashboard\data\sankey.feather")
+sankey_labels = pd.read_feather(
+    r"C:\Users\juancarlos.izurieta\Documents\R projects\IntroducedSpeciesDashboard\data\sankey_labels_indexes.feather")
 
 # Colors
 color_success = "#62c462"
@@ -326,80 +326,6 @@ def create_meter_layout(df, data_column):
     return layout
 
 
-# def create_valuecards_layout(df, column, metric_colors, alpha_colors, heading_colors):
-#     df = df.groupby([column]).size()
-#     df.sort_values(ascending=False)
-#     labels = df.index
-#     values = df.values
-#     percentages = np.round(df.values / sum(df.values) * 100, 2)
-#
-#     children = []
-#
-#     for i in range(len(labels)):
-#         children.append(
-#             html.Div(
-#                 [
-#                     html.Div(html.P(labels[i], className="valuecard-header-p"),
-#                              style={"text-align": "center", "background-color": heading_colors[i],
-#                                     "padding": "0.25rem"}),
-#                     html.Div(
-#                         [
-#                             html.Div(html.P(str(values[i]) + " especies", className="values-next-to-perc")),
-#                             html.Div(html.P(str(percentages[i]) + "% ", className="percentages")),
-#                             html.Div(create_meter(percentages[i], metric_colors[i], "#fff", "60%"),
-#                                      className="meter-container"),
-#                             html.Br()
-#                         ], style={"background-color": alpha_colors[i], "text-align": "center"}
-#                     )
-#                 ], style={"padding": "0"}
-#             )
-#         )
-#
-#     layout = html.Div(children)
-#
-#     return layout
-
-
-# def create_images_meter_layout(df, data_column, img_column):
-#     df = df.groupby([data_column, img_column]).size()
-#     df = df.sort_values(ascending=False)
-#     labels = df.index.get_level_values(data_column)  ########
-#     icons = df.index.get_level_values('icon')
-#     values = df.values
-#     percentages = np.round(df.values / sum(df.values) * 100, 2)
-#
-#     children = []
-#
-#     for i in range(len(labels)):
-#         children.append(
-#             html.Div(
-#                 [
-#                     html.Div(
-#                         [
-#                             html.Img(src=icons[i], height="25px"),
-#                             html.P(labels[i], style={"margin-right": "10px"})
-#                         ], style={"text-align": "right", "margin-right": "10px", "width": "40%"}
-#                     ),
-#                     html.Div(
-#                         [
-#                             html.Div(html.Div(create_meter(percentages[i], "info", "lightgray", "100%"))),
-#                             html.Div(
-#                                 [
-#                                     html.Div(html.P(str(values[i]) + " especies ", className="info-values")),
-#                                     html.Div(html.P("| " + str(percentages[i]) + "% ", className="percentages")),
-#                                 ], style={"display": "flex"}
-#                             )
-#                         ], style={"width": "60%", "margin-bottom": "0", "align-self": "end", "margin-right": "2rem"}
-#                     )
-#                 ], style={"display": "flex", "justify-content": "center"}
-#             )
-#         )
-#
-#     layout = html.Div(children)
-#
-#     return layout
-
-
 def create_meter(value, color, background_color, width, mode):
     # Compensating visually small values
     if value < 1:
@@ -424,3 +350,24 @@ def create_meter(value, color, background_color, width, mode):
             style={"height": "7px", "width": width, "border-radius": "1rem", "background-color": background_color})
 
     return meter
+
+
+def create_sankey(labels, source, target, value):
+    print(labels)
+    print(source)
+    fig = go.Figure(data=[go.Sankey(
+        node=dict(
+            pad=15,
+            thickness=20,
+            line=dict(color="black", width=0.5),
+            label=labels,
+            color="blue"
+        ),
+        link=dict(
+            source=source,
+            target=target,
+            value=value
+        ))])
+
+    return fig
+
